@@ -1,6 +1,7 @@
 import { NS } from '@ns'
 
 const CMD = '/cmds/grow.js'
+const BUFFER = 5000
 
 export async function grow(ns: NS, targetHost: string, hosts: string[], runCount: number): Promise<void> {
     let localRunCount = 0
@@ -22,6 +23,11 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
             const usedMem = ns.getServerUsedRam(host)
             const availableRam = maxMem - usedMem
             const ramCost = ns.getScriptRam(CMD)
+
+            if (ramCost > availableRam) {
+                continue
+            }
+
             const maxThreads = Math.floor(availableRam / ramCost)
             const runThreads = maxThreads > runDiff ? runDiff : maxThreads
 
@@ -43,19 +49,20 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
             if (localRunCount >= runCount) break
         }
 
-        if (hasThreads) {
-            ns.print('!!!!!!')
-            ns.print(`Grow Sleep: ${growTime}`)
-            ns.print(`Count: ${localRunCount}`)
-            ns.print(`Run Count: ${runCount}`)
-            ns.print('!!!!!!')
-            ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        const sleepTime = hasThreads ? growTime + BUFFER : BUFFER
 
-            await ns.sleep(growTime + 5000)
-        } else {
-            ns.print('No Threads to run...?')
-            await ns.sleep(5000)
-        }
+        ns.print('!!!!!!')
+        ns.print(`Grow Sleep: ${sleepTime}`)
+
+        ns.print(`Count: ${localRunCount}`)
+        ns.print(`Run Count: ${runCount}`)
+        ns.print(`Has Threads: ${hasThreads}`)
+        ns.print('!!!!!!')
+        ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
+
+        await ns.sleep(sleepTime)
+
+        if (localRunCount >= runCount) break
     }
 
     ns.print(`<<<<<<<<<<<<<<<<<<<<<<<<<`)

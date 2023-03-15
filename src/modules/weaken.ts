@@ -1,6 +1,7 @@
 import { NS } from '@ns'
 
 const CMD = '/cmds/weaken.js'
+const BUFFER = 5000
 
 export async function weaken(ns: NS, targetHost: string, hosts: string[], runCount: number): Promise<void> {
     let localRunCount = 0
@@ -23,6 +24,11 @@ export async function weaken(ns: NS, targetHost: string, hosts: string[], runCou
             const usedMem = ns.getServerUsedRam(host)
             const availableRam = maxMem - usedMem
             const ramCost = ns.getScriptRam(CMD)
+
+            if (ramCost > availableRam) {
+                continue
+            }
+
             const maxThreads = Math.floor(availableRam / ramCost)
             const runThreads = maxThreads > runDiff ? runDiff : maxThreads
 
@@ -43,16 +49,19 @@ export async function weaken(ns: NS, targetHost: string, hosts: string[], runCou
             if (localRunCount >= runCount) break
         }
 
-        if (hasThreads) {
-            ns.print('!!!!!!')
-            ns.print(`Weaken Sleep: ${weakenTime}`)
-            ns.print(`Count: ${localRunCount}`)
-            ns.print(`Run Count: ${runCount}`)
-            ns.print('!!!!!!')
-            ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        const sleepTime = hasThreads ? weakenTime + BUFFER : BUFFER
 
-            await ns.sleep(weakenTime + 5000)
-        }
+        ns.print('!!!!!!')
+        ns.print(`Weaken Sleep: ${sleepTime}`)
+        ns.print(`Count: ${localRunCount}`)
+        ns.print(`Run Count: ${runCount}`)
+        ns.print(`Has Threads: ${hasThreads}`)
+        ns.print('!!!!!!')
+        ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
+
+        await ns.sleep(sleepTime)
+
+        if (localRunCount >= runCount) break
     }
 
     ns.print(`<<<<<<<<<<<<<<<<<<<<<<<<<`)

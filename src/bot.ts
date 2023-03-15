@@ -14,8 +14,8 @@ Usage:
   my_program <repeating-argument> <repeating-argument>...
 `
 const WHITE_LIST = ['darkweb', 'deathstar']
-const UNLISTED = ['zer0', 'nectar-net', 'max-hardware', 'CSEC']
-const SECURITY_THRESHOLD = 3
+const UNLISTED = ['CSEC', 'omega-net', 'max-hardware', 'silver-helix', 'phantasy', 'nectar-net', 'neo-net', 'zer0']
+const SECURITY_THRESHOLD = 5
 const WEAKEN_AMOUNT = 0.05
 const HACK_AMOUNT = 0.002
 const GROW_AMOUNT = 0.004
