@@ -8,5 +8,5 @@ export async function upload(ns: NS, hosts: string[]): Promise<void> {
         ns.print(`Uploading scripts: ${SCRIPTS.join(', ')}`)
 
         await ns.scp(SCRIPTS, host)
-    });
+    })
 }

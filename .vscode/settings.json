@@ -23,4 +23,5 @@
             "snippet": "ns-template"
         },
     ],
+    "eslint.format.enable": true,
 }

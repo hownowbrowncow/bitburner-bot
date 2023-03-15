@@ -1,11 +1,9 @@
 import { NS } from '@ns'
 
-import { scanHost, scanHosts } from './utils/scan'
 import { upload } from './utils/upload'
 import { weaken } from './modules/weaken'
 import { hack } from './modules/hack'
 import { grow } from './modules/grow'
-import { ScannedHost } from './utils/state'
 
 const helpText = `
 Usage:
@@ -16,27 +14,14 @@ Usage:
   my_program <repeating-argument> <repeating-argument>...
 `
 const WHITE_LIST = ['darkweb', 'deathstar']
+const UNLISTED = ['zer0', 'nectar-net', 'max-hardware', 'CSEC']
 const SECURITY_THRESHOLD = 3
 const WEAKEN_AMOUNT = 0.05
 const HACK_AMOUNT = 0.002
+const GROW_AMOUNT = 0.004
 const TARGET = 'hong-fang-tea'
 
-function printHost(host: ScannedHost): string {
-    return `
-Name: ${host.host}
-Security Lvl: ${host.secLvl}
-Min Security Lvl: ${host.minSecLvl}
-Max Money: ${host.maxMoney}
-Money: ${host.money}
-Ram: ${host.maxRam}
-Used Ram: ${host.usedRam}
-Hack Time: ${host.hackTime}
-Grow Time: ${host.growTime}
-Weaken Time: ${host.weakenTime}
-    `;
-}
-
-export async function main(ns : NS) : Promise<void> {
+export async function main(ns: NS) : Promise<void> {
     const flags = ns.flags([
         ['host', TARGET],
         ['refreshRate', 5000],
@@ -49,7 +34,8 @@ export async function main(ns : NS) : Promise<void> {
         return
     }
 
-    const hosts = ns.scan().filter((host) => !WHITE_LIST.includes(host))
+    const scannedHosts = ns.scan().filter((host) => !WHITE_LIST.includes(host))
+    const hosts = [...scannedHosts, ...UNLISTED]
     const date = new Date()
     const targetHost = flags.host as string
     const refreshRate = parseInt(flags.refreshRate as string)
@@ -67,28 +53,25 @@ export async function main(ns : NS) : Promise<void> {
         ns.print(`Machines: ${hosts.join(', ')}`)
         ns.print(`Refresh Rate: ${refreshRate}`)
 
-        const scannedTarget = scanHost(ns, targetHost);
-
-        ns.print(printHost(scannedTarget))
-
-        const securityDiff = scannedTarget.secLvl - scannedTarget.minSecLvl
-        const moneyThreshold = scannedTarget.maxMoney * 0.75
+        const scannedTarget = ns.getServer(targetHost)
+        const securityDiff = scannedTarget.hackDifficulty - scannedTarget.minDifficulty
+        const moneyThreshold = scannedTarget.moneyMax * 0.75
 
         if (securityDiff > SECURITY_THRESHOLD) {
-            const runCount = SECURITY_THRESHOLD / WEAKEN_AMOUNT;
+            const runCount = Math.floor(SECURITY_THRESHOLD / WEAKEN_AMOUNT)
 
             ns.print(`Running weaken cmd: ${runCount}`)
 
             await weaken(ns, targetHost, hosts, runCount)
 
-        } else if (moneyThreshold > scannedTarget.money) {
-            const runCount = 25;
+        } else if (moneyThreshold > scannedTarget.moneyAvailable) {
+            const runCount = Math.floor(SECURITY_THRESHOLD / GROW_AMOUNT)
 
             ns.print(`Running grow cmd: ${runCount}`)
 
             await grow(ns, targetHost, hosts, runCount)
         } else {
-            const runCount = Math.floor(SECURITY_THRESHOLD / HACK_AMOUNT);
+            const runCount = Math.floor(SECURITY_THRESHOLD / HACK_AMOUNT)
 
             ns.print(`Running hack cmd: ${runCount}`)
 

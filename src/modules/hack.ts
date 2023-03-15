@@ -3,7 +3,7 @@ import { NS } from '@ns'
 const CMD = '/cmds/hack.js'
 
 export async function hack(ns: NS, targetHost: string, hosts: string[], runCount: number): Promise<void> {
-    let localRunCount = 0;
+    let localRunCount = 0
     const hackTime = ns.getHackTime(targetHost)
 
     ns.print(`<<<<<<<<<<<<<<<<<<<<<<<<<`)
@@ -33,7 +33,7 @@ export async function hack(ns: NS, targetHost: string, hosts: string[], runCount
 
             ns.exec(CMD, host, runThreads, targetHost)
 
-            localRunCount += runThreads;
+            localRunCount += runThreads
 
             if (localRunCount >= runCount) break
         }

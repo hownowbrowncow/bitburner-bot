@@ -3,7 +3,7 @@ import { NS } from '@ns'
 const CMD = '/cmds/weaken.js'
 
 export async function weaken(ns: NS, targetHost: string, hosts: string[], runCount: number): Promise<void> {
-    let localRunCount = 0;
+    let localRunCount = 0
     const weakenTime = ns.getWeakenTime(targetHost)
 
     ns.print(`<<<<<<<<<<<<<<<<<<<<<<<<<`)
@@ -14,7 +14,7 @@ export async function weaken(ns: NS, targetHost: string, hosts: string[], runCou
 
     while (localRunCount <= runCount) {
         ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
-        ns.print(`Local: ${localRunCount}`);
+        ns.print(`Local: ${localRunCount}`)
 
         for (const host of hosts) {
             const runDiff = runCount - localRunCount
@@ -34,7 +34,7 @@ export async function weaken(ns: NS, targetHost: string, hosts: string[], runCou
 
             ns.exec(CMD, host, runThreads, targetHost)
 
-            localRunCount += runThreads;
+            localRunCount += runThreads
 
             if (localRunCount >= runCount) break
         }
