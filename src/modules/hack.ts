@@ -45,7 +45,7 @@ export async function hack(ns: NS, targetHost: string, hosts: string[], runCount
         ns.print('!!!!!!')
         ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
 
-        await ns.sleep(hackTime + 3000)
+        await ns.sleep(hackTime + 5000)
 
         if (localRunCount >= runCount) break
     }

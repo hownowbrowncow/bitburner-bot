@@ -24,7 +24,10 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
             const maxThreads = Math.floor(availableRam / ramCost)
             const runThreads = maxThreads > runDiff ? runDiff : maxThreads
 
-            if (runThreads < 1) break
+            if (runThreads < 1) {
+                ns.print(`BREAKING NO THREADS: ${runThreads} - ${localRunCount} - ${runCount}`)
+                break
+            }
 
             ns.print(`Harvest Target: ${host}`)
             ns.print(`Available Ram: ${availableRam}`)
@@ -45,7 +48,7 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
         ns.print('!!!!!!')
         ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
 
-        await ns.sleep(growTime + 3000)
+        await ns.sleep(growTime + 5000)
 
         if (localRunCount >= runCount) break
     }
