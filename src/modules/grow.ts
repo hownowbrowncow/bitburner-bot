@@ -14,6 +14,7 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
 
     while (localRunCount < runCount) {
         ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        let hasThreads = true
 
         for (const host of hosts) {
             const runDiff = runCount - localRunCount
@@ -25,6 +26,7 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
             const runThreads = maxThreads > runDiff ? runDiff : maxThreads
 
             if (runThreads < 1) {
+                hasThreads = false
                 ns.print(`BREAKING NO THREADS: ${runThreads} - ${localRunCount} - ${runCount}`)
                 break
             }
@@ -41,16 +43,19 @@ export async function grow(ns: NS, targetHost: string, hosts: string[], runCount
             if (localRunCount >= runCount) break
         }
 
-        ns.print('!!!!!!')
-        ns.print(`Grow Sleep: ${growTime}`)
-        ns.print(`Count: ${localRunCount}`)
-        ns.print(`Run Count: ${runCount}`)
-        ns.print('!!!!!!')
-        ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        if (hasThreads) {
+            ns.print('!!!!!!')
+            ns.print(`Grow Sleep: ${growTime}`)
+            ns.print(`Count: ${localRunCount}`)
+            ns.print(`Run Count: ${runCount}`)
+            ns.print('!!!!!!')
+            ns.print('>>>>>>>>>>>>>>>>>>>>>>>>>>')
 
-        await ns.sleep(growTime + 5000)
-
-        if (localRunCount >= runCount) break
+            await ns.sleep(growTime + 5000)
+        } else {
+            ns.print('No Threads to run...?')
+            await ns.sleep(5000)
+        }
     }
 
     ns.print(`<<<<<<<<<<<<<<<<<<<<<<<<<`)
